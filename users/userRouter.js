@@ -14,8 +14,19 @@ router.post('/:id/posts', validateUserId(), (req, res, next) => {
   
 });
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
   // do your magic!
+  const options = {
+    sortBy: req.query.sortBy,
+    limit: req.query.limit,
+  }
+  
+  console.log("req.query", req.query);
+  users.get(options)
+  .then(users => {
+    res.status(200).json(users)
+  })
+  .catch(next)
 });
 
 router.get('/:id', validateUserId(), (req, res, next) => {
@@ -43,8 +54,13 @@ router.delete('/:id', validateUserId(), (req, res, next) => {
     .catch(next)
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId(), (req, res, next) => {
   // do your magic!
+  users.add(req.body)
+    .then((user) => {
+      res.status(201).json(user)
+    })
+    .catch(next)
 });
 
 //custom middleware
