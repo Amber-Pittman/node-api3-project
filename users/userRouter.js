@@ -6,26 +6,41 @@ const router = express.Router();
 
 router.post('/', (req, res) => {
   // do your magic!
+
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId(), (req, res, next) => {
   // do your magic!
+  
 });
 
 router.get('/', (req, res) => {
   // do your magic!
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId(), (req, res, next) => {
   // do your magic!
+  res.status(200).json(req.user)
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId(), (req, res, next) => {
   // do your magic!
+  user.getUserPosts(req.params.id)
+    .then(posts => {
+      res.status(200).json(posts)
+    })
+    .catch(next)
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId(), (req, res, next) => {
   // do your magic!
+  user.remove(req.params.id)
+    .then((count) => {
+      res.status(200).json({
+        message: "User deleted."
+      })
+    })
+    .catch(next)
 });
 
 router.put('/:id', (req, res) => {
@@ -58,6 +73,7 @@ function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // do your magic!
+
 }
 
 function validatePost(req, res, next) {
