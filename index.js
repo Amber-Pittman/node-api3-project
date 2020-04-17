@@ -2,6 +2,7 @@
 const express = require("express")
 const cors = require("cors")
 // const morgan = require("morgan")
+const logger = require("./middleware/logger")
 
 const postRouter = require("./posts/postRouter")
 const userRouter = require("./users/userRouter")
@@ -12,6 +13,7 @@ const port = 8080;
 server.use(express.json())
 server.use(cors())
 // server.use(morgan())
+server.use(logger)
 
 server.use("/posts", postRouter)
 server.use("/users", userRouter)
