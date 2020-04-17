@@ -4,14 +4,29 @@ const posts = require("../posts/postDb")
 
 const router = express.Router();
 
-router.post('/', (req, res) => {
+router.post('/', validateUser(), (req, res, next) => {
   // do your magic!
-
+  users.insert(req.body)
+  .then((user) => {
+    res.status(201).json(user)
+  })
+  .catch(next)
+  // you could do catch this way:
+  //.catch(error => {
+    //next(error)
+  //})
 });
 
-router.post('/:id/posts', validateUserId(), (req, res, next) => {
+router.post('/:id/posts', validatePost(), validateUserId(), (req, res, next) => {
   // do your magic!
-  
+  const{ text } = req.body
+  const { id: user_id } = req.params
+
+  posts.insert({ text, user_id})
+    .then((user) => {
+      res.status(201).json(user)
+    })
+    .catch(next)
 });
 
 router.get('/', (req, res, next) => {
@@ -20,7 +35,7 @@ router.get('/', (req, res, next) => {
     sortBy: req.query.sortBy,
     limit: req.query.limit,
   }
-  
+
   console.log("req.query", req.query);
   users.get(options)
   .then(users => {
@@ -29,14 +44,14 @@ router.get('/', (req, res, next) => {
   .catch(next)
 });
 
-router.get('/:id', validateUserId(), (req, res, next) => {
+router.get('/:id', validateUserId(), (req, res) => {
   // do your magic!
   res.status(200).json(req.user)
 });
 
 router.get('/:id/posts', validateUserId(), (req, res, next) => {
   // do your magic!
-  user.getUserPosts(req.params.id)
+  users.getUserPosts(req.params.id)
     .then(posts => {
       res.status(200).json(posts)
     })
@@ -45,7 +60,7 @@ router.get('/:id/posts', validateUserId(), (req, res, next) => {
 
 router.delete('/:id', validateUserId(), (req, res, next) => {
   // do your magic!
-  user.remove(req.params.id)
+  users.remove(req.params.id)
     .then((count) => {
       res.status(200).json({
         message: "User deleted."
@@ -54,9 +69,9 @@ router.delete('/:id', validateUserId(), (req, res, next) => {
     .catch(next)
 });
 
-router.put('/:id', validateUserId(), (req, res, next) => {
+router.put('/:id', validateUser(), validateUserId(), (req, res, next) => {
   // do your magic!
-  users.add(req.body)
+  users.update(req.params.id, req.body)
     .then((user) => {
       res.status(201).json(user)
     })
@@ -87,13 +102,26 @@ function validateUserId(req, res, next) {
   }
 }
 
-function validateUser(req, res, next) {
+function validateUser() {
   // do your magic!
+  return (req, res, next) => {
+    if (!req.body || !req.body.name) {
+      return res.status(400).json({
+        message: "Missing User Name or Data",
+      })
+  } 
+  next()
+}}
 
-}
-
-function validatePost(req, res, next) {
+function validatePost() {
   // do your magic!
-}
+  return (req, res, next) => {
+    if (!req.body || !req.body.text) {
+      return res.status(400).json({
+        message: "Missing Post Data or Required Text",
+      })
+  } 
+  next()
+}}
 
 module.exports = router;
