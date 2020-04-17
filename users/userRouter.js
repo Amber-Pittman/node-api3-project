@@ -1,4 +1,5 @@
 const express = require('express');
+const users = require("./userDb")
 
 const router = express.Router();
 
@@ -34,6 +35,19 @@ router.put('/:id', (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
+  return (req, res, next) => {
+    users.getById(req.params.id)
+      .then(user => {
+        if (user) {
+          req.user = user
+          next()
+        } else {
+          res.status(400).json({
+            message: "invalid user id"
+          })
+        }
+      })
+  }
 }
 
 function validateUser(req, res, next) {
