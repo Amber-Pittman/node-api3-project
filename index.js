@@ -13,7 +13,7 @@ const port = 8080;
 server.use(express.json())
 server.use(cors())
 // server.use(morgan())
-server.use(logger)
+server.use(logger({format: "long"}))
 
 server.use("/posts", postRouter)
 server.use("/users", userRouter)
